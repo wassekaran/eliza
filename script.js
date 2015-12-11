@@ -1,7 +1,7 @@
-{
-  "_comment": "Based on Simon Coffey's script: https://github.com/urbanautomaton/eliza-js",
+// Based on Simon Coffey's script: https://github.com/urbanautomaton/eliza-js
 
-
+var script = {
+  
   "initial": [
     "How do you do. Please tell me your problem.",
     "Please tell me what's been bothering you.",
