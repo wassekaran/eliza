@@ -7,7 +7,7 @@ Eliza.prototype.parseScript = function() {
   var keys = this.script.keys;
   var synonyms = this.script.synonyms;
 
-  // Collapse synonymns to a regular expression
+  // Collapse synonymns
   for (var syn in synonyms)
     synonyms[syn] = "(" + syn + "|" + synonyms[syn].join("|") + ")";
 
@@ -50,7 +50,7 @@ Eliza.prototype.parseScript = function() {
         left += right.substring(0, leftEnd);
         if (match[1] !== "") left += "\\b";
         left += "\\s*(.*)\\s*";
-        if (match[2] !== "") left += "\\b";
+        if (match[3] !== "") left += "\\b";
         right = right.substring(rightStart, right.length);
         match = right.match(hasAsterisk);
       }
@@ -63,35 +63,28 @@ Eliza.prototype.parseScript = function() {
       decomp[j]["rule"] = rule;
     }
   }
+
+  // Sort keys by weight
+  keys.sort(function(a, b) { return b["weight"] - a["weight"]; });
+}
+
+Eliza.prototype.getReply = function(input) {
+  // Clean and split user input
+  input = input.trim();
+  input = input.toLowerCase();
+  input = input.replace(/\s*[-,;:?!]+\s*/g, "."); // Punctuations -> period
+  input = input.replace(/\s{2, }/g, " ");         // Multiple spaces
+  input = input.replace(/.$/, "");                // Final period
+
+  var parts = input.split(".");
+  
+  // Find highest ranked keyword
 }
 
 // Code for testing
-var test_script = {
-  "synonyms": {
-    "bar": ["feel", "think", "believe", "wish"],
-    "baz": ["everybody", "nobody", "noone"]  
-  },
-  "keys": [
-    {
-      "word": "no",
-      "weight": 1,
-      "decomp": [
-        { "rule": "*" },
-        { "rule": "foo @bar" }, 
-        { "rule": "foo * @bar"}, 
-        { "rule": "* foo @bar *" },
-        { "rule": "* foo * @bar *" },
-        { "rule": "foo @bar * @baz boh" }
-      ]
-    }
-  ]
-};
+var eliza = new Eliza(script);
 
-var eliza = new Eliza(test_script);
-
-// Print out the converted rules
+// Print out weights
 var keys = eliza.script.keys;
 for (var i = 0; i < keys.length; i++)
-  var decomp = keys[i]["decomp"];
-  for (var j = 0; j < decomp.length; j++)
-    console.log(decomp[j]["rule"]);
+  console.log(keys[i]["weight"]);
